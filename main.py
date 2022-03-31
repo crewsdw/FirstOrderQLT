@@ -8,25 +8,27 @@ import timestep as ts
 # import data
 
 # Geometry and grid parameters
-elements, order = [1400, 80], 10
+elements, order = [1400, 60], 10  # 80, 10
 vt = 1
 chi = 0.05
 vb = 5
 vtb = chi ** (1 / 3) * vb
 
 # Grids
-length = 10000  # 2.0 * np.pi / 0.126  # 500  # 5000  # 1000
-lows = np.array([-length / 2, -30 * vt])
-highs = np.array([length / 2, 30 * vt])
+length = 1000  # 10000 # 2.0 * np.pi / 0.126  # 500  # 5000  # 1000
+lows = np.array([-length / 2, -15 * vt])
+highs = np.array([length / 2, 15 * vt])
 grid = g.PhaseSpace(lows=lows, highs=highs, elements=elements, order=order)
 
 # Build distribution
 mean_distribution = var.Scalar(resolution=elements[1], order=order)
-mean_distribution.initialize_bump_on_tail(grid=grid, vt=vt, u=0, chi=chi, vb=vb, vtb=vtb)
+# mean_distribution.initialize_bump_on_tail(grid=grid, vt=vt, u=0, chi=chi, vb=vb, vtb=vtb)
+mean_distribution.initialize_maxwellian(grid=grid, vt=vt)
 
 fluctuating_distribution = var.Distribution(resolutions=elements, order=order, charge_mass=-1.0)
 fluctuating_distribution.set_up_higher_quad(grid=grid)
-fluctuating_distribution.initialize_bump_on_tail(grid=grid, vt=vt, u=0, chi=chi, vb=vb, vtb=vtb)
+# fluctuating_distribution.initialize_bump_on_tail(grid=grid, vt=vt, u=0, chi=chi, vb=vb, vtb=vtb)
+fluctuating_distribution.initialize_maxwellian(grid=grid, vt=vt)
 fluctuating_distribution.fourier_transform(), fluctuating_distribution.inverse_fourier_transform()
 
 # Set up elliptic problem
@@ -44,9 +46,9 @@ Plotter.show()
 # Time integration class and stepping information
 t0 = timer.time()
 time = 0
-dt = 2.5e-3  # 4.7e-4
-step = 2.5e-3  # 4.7e-4
-final_time = 250.0e0  # 31  # 101  # 172  # 151  # 100  # 100  # 150  # 50
+dt = 5.0e-4  # 4.7e-4
+step = 5.0e-4  # 4.7e-4
+final_time = 5.0e0  # 31  # 101  # 172  # 151  # 100  # 100  # 150  # 50
 steps = int(np.abs(final_time // step))
 dt_max_translate = 1.0 / (np.amax(grid.x.wavenumbers) * np.amax(grid.v.arr)) / (2 * order + 1)
 cutoff_velocity = 1.0 / (np.amax(grid.x.wavenumbers) * dt) / (2 * order + 1)

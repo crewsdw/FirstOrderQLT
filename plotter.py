@@ -112,8 +112,8 @@ class Plotter:
             distribution.arr[0, :] = 0
             distribution.inverse_fourier_transform()
 
-        cb = np.linspace(0.1 * np.amin(distribution.arr_nodal.get()),
-                         0.1 * np.amax(distribution.arr_nodal.get()), num=200)
+        cb = np.linspace(np.amin(distribution.arr_nodal.get()),
+                         np.amax(distribution.arr_nodal.get()), num=100)  # * 0.1
         # cb = np.linspace(-1, 1, num=100)
         if remove_average:
             cb = cb * 0.05
@@ -278,7 +278,7 @@ class Plotter:
             if quadratic:
                 plt.loglog(self.fundamental * self.k.flatten(), np.absolute(spectral_arr) ** 2.0, 'o', markersize=1.0)
             plt.xlabel(r'Wavenumber $k\lambda_D$'), plt.ylabel(y_axis + ' spectrum')
-            plt.xlim([0.025, 0.5]), plt.ylim([1.0e-16, 1.0e-4])
+            # plt.xlim([0.025, 0.5]), plt.ylim([1.0e-16, 1.0e-10])
             plt.grid(True), plt.tight_layout()
 
     def time_series_plot(self, time_in, series_in, y_axis, log=False, give_rate=False, numpy=False):

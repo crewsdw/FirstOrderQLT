@@ -143,6 +143,23 @@ class Distribution:
     def spectral_flatten(self):
         return self.arr.reshape(self.arr.shape[0], self.v_res * self.order)
 
+    def initialize_maxwellian(self, grid, vt, perturbation=True):
+        maxwellian = grid.v.compute_maxwellian(thermal_velocity=vt, drift_velocity=0)
+
+        if perturbation:
+            f1 = cp.zeros((grid.x.device_modes.shape[0], self.v_res, self.order)) + 0j
+            for idx in range(grid.x.wavenumbers.shape[0]):
+                # if 50 < idx < 500:
+                if idx == 300:
+                    f1[idx, :, :] = cp.sqrt(1.0e-11) * grid.x.wavenumbers[idx] * maxwellian * cp.exp(
+                        2j * cp.pi * cp.random.random(1))
+        else:
+            f1 = 0
+
+        inverse = cp.fft.irfft(f1, axis=0, norm='forward')
+        self.arr_nodal = inverse
+        print('Finished initialization...')
+
     def initialize_bump_on_tail(self, grid, vt, u, chi, vb, vtb, perturbation=True):
         # ix, iv = cp.ones_like(grid.x.device_arr), cp.ones_like(grid.v.device_arr)
         # maxwellian = cp.tensordot(ix, grid.v.compute_maxwellian(thermal_velocity=vt,
@@ -233,6 +250,9 @@ class Scalar:
         self.arr, self.grad = None, None
         self.grad2 = None
         self.arr_spectral, self.grad_spectral = None, None
+
+    def initialize_maxwellian(self, grid, vt):
+        self.arr = grid.v.compute_maxwellian(thermal_velocity=vt, drift_velocity=0)
 
     def initialize_bump_on_tail(self, grid, vt, u, chi, vb, vtb):
         maxwellian = grid.v.compute_maxwellian(thermal_velocity=vt, drift_velocity=u)

@@ -24,6 +24,7 @@ class StepperSingleSpecies:
         self.steps = steps
         # nu = hyperviscosity
         self.mean_flux = fx.MeanFlux(resolution=self.v_res, order=order, charge_mass=-1.0)
+        # self.mean_flux.initialize_zero_pad(grid=grid)
         self.fluctuation_flux = fx.FluctuationFlux(resolutions=resolutions, order=order, charge_mass=-1.0, nu=nu)
         self.fluctuation_flux.initialize_zero_pad(grid=grid)
         self.total_distribution = var.Distribution(resolutions=resolutions, order=order, charge_mass=-1.0)

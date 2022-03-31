@@ -27,6 +27,9 @@ class MeanFlux:
         # arrays
         self.flux = var.Scalar(resolution=resolution, order=order)
         self.output = var.Scalar(resolution=resolution, order=order)
+        # self.pad_field = None
+        # self.pad_fluct = None
+        # self.pad_dx = None
 
         # charge sign
         self.charge = charge_mass
@@ -38,7 +41,32 @@ class MeanFlux:
                                      fluctuating_distribution=fluctuating_distribution, elliptic=elliptic, grid=grid)
         self.output.arr = (grid.v.J[:, None] * self.v_flux(grid=grid, num_flux=num_flux))
 
+    # def initialize_zero_pad(self, grid):
+    #     self.pad_field = cp.zeros((grid.x.modes + grid.x.pad_width)) + 0j
+    #     self.pad_fluct = cp.zeros((grid.x.modes + grid.x.pad_width,
+    #                                self.v_res, self.order)) + 0j
+    #     self.pad_dx = grid.x.length / (grid.x.elements + 2 * grid.x.pad_width)
+        # print(grid.x.dx)
+        # print(self.pad_dx)
+        # quit()
+
     def compute_flux(self, mean_distribution, fluctuating_distribution, elliptic, grid):
+        # Zero-pad
+        # self.pad_field[:-grid.x.pad_width] = elliptic.field.arr_spectral
+        # self.pad_fluct[:-grid.x.pad_width, :, :] = fluctuating_distribution.arr
+
+        # Pseudospectral product
+        # field_nodal = cp.fft.irfft(self.pad_field, norm='forward')
+        # fluct_nodal = cp.fft.irfft(self.pad_fluct, norm='forward', axis=0)
+
+        # print(grid.x.dx)
+        # print(field_nodal.shape)
+        # print(grid.x.length / field_nodal.shape)
+        # quit()
+        #
+        # nodal_flux = self.charge * cp.multiply(field_nodal[:, None, None], fluct_nodal)
+        # self.flux.arr = trapz2(y=nodal_flux, dx=self.pad_dx) / grid.x.length
+
         self.flux.arr = trapz2(y=(fluctuating_distribution.arr_nodal *
                                   self.charge * elliptic.field.arr_nodal[:, None, None]),
                                dx=grid.x.dx) / grid.x.length
