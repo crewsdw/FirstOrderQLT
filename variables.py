@@ -150,8 +150,9 @@ class Distribution:
             f1 = cp.zeros((grid.x.device_modes.shape[0], self.v_res, self.order)) + 0j
             for idx in range(grid.x.wavenumbers.shape[0]):
                 # if 50 < idx < 500:
-                if idx == 300:
-                    f1[idx, :, :] = cp.sqrt(1.0e-11) * grid.x.wavenumbers[idx] * maxwellian * cp.exp(
+                # if idx == 300:
+                if idx > 0:
+                    f1[idx, :, :] = cp.sqrt(1.0e-6) * grid.x.wavenumbers[idx] * maxwellian * cp.exp(
                         2j * cp.pi * cp.random.random(1))
         else:
             f1 = 0

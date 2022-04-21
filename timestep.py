@@ -15,7 +15,7 @@ nonlinear_ssp_rk_switch = {
 
 
 class StepperSingleSpecies:
-    def __init__(self, dt, step, resolutions, order, steps, grid, nu):
+    def __init__(self, dt, step, resolutions, order, steps, grid):
         self.x_res, self.v_res = resolutions
         self.resolutions = resolutions
         self.order = order
@@ -25,7 +25,7 @@ class StepperSingleSpecies:
         # nu = hyperviscosity
         self.mean_flux = fx.MeanFlux(resolution=self.v_res, order=order, charge_mass=-1.0)
         # self.mean_flux.initialize_zero_pad(grid=grid)
-        self.fluctuation_flux = fx.FluctuationFlux(resolutions=resolutions, order=order, charge_mass=-1.0, nu=nu)
+        self.fluctuation_flux = fx.FluctuationFlux(resolutions=resolutions, order=order, charge_mass=-1.0)
         self.fluctuation_flux.initialize_zero_pad(grid=grid)
         self.total_distribution = var.Distribution(resolutions=resolutions, order=order, charge_mass=-1.0)
 
@@ -52,7 +52,7 @@ class StepperSingleSpecies:
         self.save_times = np.array([0])
         # self.save_times = np.append(np.linspace(140, 170, num=301), 0)
 
-    def main_loop_adams_bashforth(self, mean_distribution, fluctuating_distribution, elliptic, grid):
+    def main_loop_adams_bashforth(self, mean_distribution, fluctuating_distribution, elliptic, grid, plotter, mean_ic):
         """
         Evolve the Vlasov equation in wavenumber space using the Adams-Bashforth time integration scheme
         """
@@ -121,6 +121,11 @@ class StepperSingleSpecies:
                 # max_field = cp.amax(elliptic.field.arr_nodal)
                 # max_dt = grid.v.min_dv / max_field / (2 * self.order + 1) / (2 * np.pi) * 0.01
                 print('Took 50 steps, time is {:0.3e}'.format(self.time))
+                plotter.spatial_scalar_plot(scalar=elliptic.field, y_axis='Electric field', quadratic=True,
+                                            save='results\\field_spectrum\\{:0.1f}'.format(self.time))
+                # plotter.velocity_scalar_plot_difference(scalar1=mean_distribution, scalar2=mean_ic,
+                #                                         save='results\\change_in_mean\\{:0.1f}'.format(self.time))
+                plt.close('all')
                 # print('Max velocity-flux dt is {:0.3e}'.format(max_dt))
 
             # if np.abs(self.time - self.save_times[save_counter]) < 6.0e-3:

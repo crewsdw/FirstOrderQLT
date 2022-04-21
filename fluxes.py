@@ -71,8 +71,8 @@ class MeanFlux:
                                   self.charge * elliptic.field.arr_nodal[:, None, None]),
                                dx=grid.x.dx) / grid.x.length
 
-        # return self.nodal_central_flux(flux=self.flux.arr)
-        return self.nodal_lax_friedrichs_flux(mean_distribution=mean_distribution, flux=self.flux.arr)
+        return self.nodal_central_flux(flux=self.flux.arr)
+        # return self.nodal_lax_friedrichs_flux(mean_distribution=mean_distribution, flux=self.flux.arr)
 
     def nodal_central_flux(self, flux):
         # Allocate
@@ -130,7 +130,7 @@ class MeanFlux:
 
 
 class FluctuationFlux:
-    def __init__(self, resolutions, order, charge_mass, nu):
+    def __init__(self, resolutions, order, charge_mass):
         self.x_ele, self.v_res = resolutions
         self.x_res = int(self.x_ele // 2 + 1)
         self.order = order
@@ -153,7 +153,6 @@ class FluctuationFlux:
 
         # species dependence
         self.charge = charge_mass
-        self.nu = nu  # hyperviscosity
 
     def semi_discrete_rhs(self, mean_distribution, elliptic, grid):
         """ Computes the semi-discrete equation for velocity flux only """

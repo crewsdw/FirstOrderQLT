@@ -142,15 +142,15 @@ class Plotter:
         if plot_spectrum:
             spectrum_to_plot = distribution.spectral_flatten()
             # spectrum_to_plot[self.grid.x.zero_idx, :] = 0.0
-            spectrum = np.log(1.0 + np.absolute(spectrum_to_plot.get()))
-            # cb_s = np.linspace(np.amin(spectrum), 0.05 * np.amax(spectrum), num=100)
-            cb_s = np.linspace(0, 3e-4, num=100)
+            spectrum = np.absolute(spectrum_to_plot.get())  # np.log(1.0 + np.absolute(spectrum_to_plot.get()))
+            cb_s = np.linspace(np.amin(spectrum), np.amax(spectrum), num=100)
+            # cb_s = np.linspace(0, 3e-4, num=100)
 
             plt.figure(figsize=(3*1.618, 3))
             # plt.contourf(self.FX, self.FV, spectrum, cb_s, extend='both')  # , cmap=self.colormap)
             plt.pcolormesh(self.FX, self.FV, spectrum, shading='gouraud', vmin=cb_s[0], vmax=cb_s[-1], rasterized=True)
             plt.xlabel(r'Wavenumber $k\lambda_D$'), plt.ylabel(r'Velocity $v/v_t$')
-            # plt.xlim([0, 1.65]), plt.ylim([-4, 10])
+            plt.ylim([-5, 5])  # plt.xlim([0, 3.5])
             plt.colorbar(), plt.tight_layout()
 
     def plot_average_distribution(self, distribution):
@@ -164,6 +164,17 @@ class Plotter:
         plt.plot(self.v, scalar.arr.flatten().get(), 'o--')
         plt.xlabel('Velocity'), plt.ylabel(r'Distribution $\langle f\rangle_L$')
         plt.grid(True), plt.tight_layout()
+
+    def velocity_scalar_plot_difference(self, scalar1, scalar2, save=False):
+        difference = scalar1.arr.flatten().get() - scalar2.arr.flatten().get()
+        plt.figure(figsize=(3*1.618, 3))
+        plt.plot(self.v, difference)
+        plt.xlabel('Velocity'), plt.ylabel(r'Difference from IC, $\langle f\rangle_L(t) - \langle f\rangle_L(0)$')
+        plt.grid(True)
+        plt.xlim([-15, 15])
+        plt.tight_layout()
+        if save:
+            plt.savefig(save + '.png')
 
     def plot_many_velocity_averages(self, times, avg_dists, y_label):
         plt.figure()
@@ -265,8 +276,8 @@ class Plotter:
         # plt.colorbar(), plt.tight_layout()
         # plt.show()
 
-        if save:
-            plt.savefig(save + '.png')
+        # if save:
+        #     plt.savefig(save + '.png')
 
         if spectrum:
             plt.figure(figsize=(3*1.618, 3))
@@ -278,8 +289,10 @@ class Plotter:
             if quadratic:
                 plt.loglog(self.fundamental * self.k.flatten(), np.absolute(spectral_arr) ** 2.0, 'o', markersize=1.0)
             plt.xlabel(r'Wavenumber $k\lambda_D$'), plt.ylabel(y_axis + ' spectrum')
-            # plt.xlim([0.025, 0.5]), plt.ylim([1.0e-16, 1.0e-10])
+            plt.ylim([1.0e-42, 1.0e-5])  # plt.xlim([0.045, 6.1]),
             plt.grid(True), plt.tight_layout()
+            if save:
+                plt.savefig(save + '.png')
 
     def time_series_plot(self, time_in, series_in, y_axis, log=False, give_rate=False, numpy=False):
         if not numpy:

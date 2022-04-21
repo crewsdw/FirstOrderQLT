@@ -8,14 +8,14 @@ import timestep as ts
 # import data
 
 # Geometry and grid parameters
-elements, order = [1400, 60], 10  # 80, 10
+elements, order = [2000, 100], 10  # 80, 10  # 1400
 vt = 1
 chi = 0.05
 vb = 5
 vtb = chi ** (1 / 3) * vb
 
 # Grids
-length = 1000  # 10000 # 2.0 * np.pi / 0.126  # 500  # 5000  # 1000
+length = 500  # 10000 # 2.0 * np.pi / 0.126  # 500  # 5000  # 1000
 lows = np.array([-length / 2, -15 * vt])
 highs = np.array([length / 2, 15 * vt])
 grid = g.PhaseSpace(lows=lows, highs=highs, elements=elements, order=order)
@@ -24,6 +24,9 @@ grid = g.PhaseSpace(lows=lows, highs=highs, elements=elements, order=order)
 mean_distribution = var.Scalar(resolution=elements[1], order=order)
 # mean_distribution.initialize_bump_on_tail(grid=grid, vt=vt, u=0, chi=chi, vb=vb, vtb=vtb)
 mean_distribution.initialize_maxwellian(grid=grid, vt=vt)
+
+initial_mean = var.Scalar(resolution=elements[1], order=order)
+initial_mean.initialize_maxwellian(grid=grid, vt=vt)
 
 fluctuating_distribution = var.Distribution(resolutions=elements, order=order, charge_mass=-1.0)
 fluctuating_distribution.set_up_higher_quad(grid=grid)
@@ -46,8 +49,8 @@ Plotter.show()
 # Time integration class and stepping information
 t0 = timer.time()
 time = 0
-dt = 5.0e-4  # 4.7e-4
-step = 5.0e-4  # 4.7e-4
+dt = 2.0e-3  # 4.7e-4
+step = 2.0e-3  # 4.7e-4
 final_time = 5.0e0  # 31  # 101  # 172  # 151  # 100  # 100  # 150  # 50
 steps = int(np.abs(final_time // step))
 dt_max_translate = 1.0 / (np.amax(grid.x.wavenumbers) * np.amax(grid.v.arr)) / (2 * order + 1)
@@ -57,10 +60,10 @@ print('Cutoff velocity at max wavenumber is {:0.3e}'.format(cutoff_velocity))
 
 # Set up stepper and execute main loop
 Stepper = ts.StepperSingleSpecies(dt=dt, step=step, resolutions=elements, order=order,
-                                  steps=steps, grid=grid, nu=1.0e-2)  #
+                                  steps=steps, grid=grid)  #
 Stepper.main_loop_adams_bashforth(mean_distribution=mean_distribution,
                                   fluctuating_distribution=fluctuating_distribution,
-                                  elliptic=Elliptic, grid=grid)
+                                  elliptic=Elliptic, grid=grid, plotter=Plotter, mean_ic=initial_mean)
 Elliptic.field.inverse_fourier_transform()
 print('Done, it took {:0.3e}'.format(timer.time() - t0))
 
