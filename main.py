@@ -8,30 +8,30 @@ import timestep as ts
 # import data
 
 # Geometry and grid parameters
-elements, order = [2000, 100], 10  # 80, 10  # 1400
+elements, order = [2000, 80], 10  # 80, 10  # 1400
 vt = 1
 chi = 0.05
 vb = 5
 vtb = chi ** (1 / 3) * vb
 
 # Grids
-length = 500  # 10000 # 2.0 * np.pi / 0.126  # 500  # 5000  # 1000
-lows = np.array([-length / 2, -15 * vt])
-highs = np.array([length / 2, 15 * vt])
+length = 5000  # 10000 # 2.0 * np.pi / 0.126  # 500  # 5000  # 1000
+lows = np.array([-length / 2, -25 * vt])
+highs = np.array([length / 2, 25 * vt])
 grid = g.PhaseSpace(lows=lows, highs=highs, elements=elements, order=order)
 
 # Build distribution
 mean_distribution = var.Scalar(resolution=elements[1], order=order)
-# mean_distribution.initialize_bump_on_tail(grid=grid, vt=vt, u=0, chi=chi, vb=vb, vtb=vtb)
-mean_distribution.initialize_maxwellian(grid=grid, vt=vt)
+mean_distribution.initialize_bump_on_tail(grid=grid, vt=vt, u=0, chi=chi, vb=vb, vtb=vtb)
+# mean_distribution.initialize_maxwellian(grid=grid, vt=vt)
 
 initial_mean = var.Scalar(resolution=elements[1], order=order)
 initial_mean.initialize_maxwellian(grid=grid, vt=vt)
 
 fluctuating_distribution = var.Distribution(resolutions=elements, order=order, charge_mass=-1.0)
 fluctuating_distribution.set_up_higher_quad(grid=grid)
-# fluctuating_distribution.initialize_bump_on_tail(grid=grid, vt=vt, u=0, chi=chi, vb=vb, vtb=vtb)
-fluctuating_distribution.initialize_maxwellian(grid=grid, vt=vt)
+fluctuating_distribution.initialize_bump_on_tail(grid=grid, vt=vt, u=0, chi=chi, vb=vb, vtb=vtb)
+# fluctuating_distribution.initialize_maxwellian(grid=grid, vt=vt)
 fluctuating_distribution.fourier_transform(), fluctuating_distribution.inverse_fourier_transform()
 
 # Set up elliptic problem
@@ -51,7 +51,7 @@ t0 = timer.time()
 time = 0
 dt = 2.0e-3  # 4.7e-4
 step = 2.0e-3  # 4.7e-4
-final_time = 5.0e0  # 31  # 101  # 172  # 151  # 100  # 100  # 150  # 50
+final_time = 250.0e0  # 31  # 101  # 172  # 151  # 100  # 100  # 150  # 50
 steps = int(np.abs(final_time // step))
 dt_max_translate = 1.0 / (np.amax(grid.x.wavenumbers) * np.amax(grid.v.arr)) / (2 * order + 1)
 cutoff_velocity = 1.0 / (np.amax(grid.x.wavenumbers) * dt) / (2 * order + 1)

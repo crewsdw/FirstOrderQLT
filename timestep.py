@@ -121,11 +121,11 @@ class StepperSingleSpecies:
                 # max_field = cp.amax(elliptic.field.arr_nodal)
                 # max_dt = grid.v.min_dv / max_field / (2 * self.order + 1) / (2 * np.pi) * 0.01
                 print('Took 50 steps, time is {:0.3e}'.format(self.time))
-                plotter.spatial_scalar_plot(scalar=elliptic.field, y_axis='Electric field', quadratic=True,
-                                            save='results\\field_spectrum\\{:0.1f}'.format(self.time))
+                # plotter.spatial_scalar_plot(scalar=elliptic.field, y_axis='Electric field', quadratic=True,
+                #                             save='results\\field_spectrum\\{:0.1f}'.format(self.time))
                 # plotter.velocity_scalar_plot_difference(scalar1=mean_distribution, scalar2=mean_ic,
                 #                                         save='results\\change_in_mean\\{:0.1f}'.format(self.time))
-                plt.close('all')
+                # plt.close('all')
                 # print('Max velocity-flux dt is {:0.3e}'.format(max_dt))
 
             # if np.abs(self.time - self.save_times[save_counter]) < 6.0e-3:
